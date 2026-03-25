@@ -328,8 +328,13 @@ export function ChatPage() {
                     <div className="mb-2 text-xs uppercase tracking-wide text-slate-500">
                       assistant
                     </div>
+
                     <div className="whitespace-pre-wrap text-slate-100">
-                      {streamingText || "Thinking..."}
+                      {streamingText.length === 0 ? (
+                        <span className="text-slate-400">Thinking...</span>
+                      ) : (
+                        streamingText
+                      )}
                     </div>
                   </div>
                 ) : null}
