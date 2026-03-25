@@ -148,9 +148,6 @@ export function ChatPage() {
     const currentImageUrl = imageUrl;
     setImageUrl(null);
 
-    await queryClient.invalidateQueries({
-      queryKey: ["messages", identityKey, chatId],
-    });
     try {
       await streamMessage({
         chatId,
@@ -161,23 +158,21 @@ export function ChatPage() {
         },
       });
 
-      setStreamingText("");
-      await queryClient.invalidateQueries({
-        queryKey: ["messages", identityKey, chatId],
-      });
       await queryClient.invalidateQueries({ queryKey: ["chats", identityKey] });
       await queryClient.invalidateQueries({ queryKey: ["anonymous-me"] });
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Streaming failed";
       setSendError(message);
-      setStreamingText("");
+
       if (currentImageUrl) {
         setImageUrl(currentImageUrl);
       }
+
       await queryClient.invalidateQueries({ queryKey: ["anonymous-me"] });
     } finally {
       setIsStreaming(false);
+      setStreamingText("");
     }
   }
 
