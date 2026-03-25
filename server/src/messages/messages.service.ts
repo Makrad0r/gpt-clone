@@ -170,14 +170,16 @@ export class MessagesService {
     }
   }
 
-  buildOpenAiMessages(
-    history: MessageRow[],
-  ): Array<{ role: 'system' | 'user' | 'assistant'; content: string }> {
+  buildOpenAiMessages(history: MessageRow[]): Array<{
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+    imageUrl?: string | null;
+  }> {
     return [
       {
         role: 'system',
         content:
-          'You are a helpful AI assistant. Be concise, clear, and useful.',
+          'You are a helpful AI assistant. If the user attached an image, analyze what is visible in the image and answer their question about it.',
       },
       ...history
         .filter(
@@ -186,6 +188,7 @@ export class MessagesService {
         .map((message) => ({
           role: message.role,
           content: message.content,
+          imageUrl: message.role === 'user' ? message.image_url : null,
         })),
     ];
   }
