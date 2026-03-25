@@ -14,9 +14,21 @@ async function bootstrap() {
   const clientUrl = configService.get<string>('CLIENT_URL');
 
   app.enableCors({
-    origin: clientUrl
-      ? [clientUrl, 'http://localhost:5173']
-      : ['http://localhost:5173'],
+    origin: (origin, callback) => {
+      const allowedOrigins = ['http://localhost:5173', clientUrl].filter(
+        Boolean,
+      ) as string[];
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     credentials: true,
   });
 
