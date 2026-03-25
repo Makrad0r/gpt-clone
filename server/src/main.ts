@@ -15,21 +15,27 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = ['http://localhost:5173', clientUrl].filter(
-        Boolean,
-      ) as string[];
-
       if (!origin) {
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      const isLocalhost = origin === 'http://localhost:5173';
+      const isClientUrl = !!clientUrl && origin === clientUrl;
+      const isVercelPreview = /\.vercel\.app$/.test(origin);
+
+      if (isLocalhost || isClientUrl || isVercelPreview) {
         return callback(null, true);
       }
 
       return callback(new Error(`CORS blocked for origin: ${origin}`), false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-anonymous-session-token',
+    ],
   });
 
   app.useGlobalPipes(
